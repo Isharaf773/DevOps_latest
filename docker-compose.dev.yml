@@ -1,0 +1,92 @@
+version: '3.8'
+
+# Development Docker Compose Configuration
+# Run with: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0-alpine
+    container_name: food_mongodb_dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: fooddb
+    volumes:
+      - mongodb_data_dev:/data/db
+    networks:
+      - food-network-dev
+
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: food_backend_dev
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://admin:password@mongodb:27017/fooddb?authSource=admin
+      PORT: 4000
+      NODE_ENV: development
+      JWT_SECRET: dev_secret_key
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/uploads:/app/uploads
+    networks:
+      - food-network-dev
+
+  # Frontend App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: food_frontend_dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:4000
+      NODE_ENV: development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - food-network-dev
+
+  # Admin Panel
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: food_admin_dev
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:4000
+      NODE_ENV: development
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    networks:
+      - food-network-dev
+
+networks:
+  food-network-dev:
+    driver: bridge
+
+volumes:
+  mongodb_data_dev:
+    driver: local
