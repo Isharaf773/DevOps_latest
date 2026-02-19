@@ -77,7 +77,7 @@ pipeline {
                 bat '''
                     docker-compose down --remove-orphans
                     docker-compose up -d
-                    timeout /t 10
+                    timeout /t 10 /nobreak
                 '''
             }
         }
