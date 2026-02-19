@@ -1,13 +1,15 @@
-# Root Dockerfile for quick single-container deployment (optional)
-# Use docker-compose.yml for the recommended multi-container setup
-
 FROM node:18-alpine
 
 WORKDIR /app
 
-# This is a placeholder. Use docker-compose.yml for the complete setup
-# Copy and run all three services (backend, frontend, admin)
+# මුලින්ම package.json files ටික විතරක් copy කරනවා (Build speed එක වැඩි වෙන්න)
+COPY package*.json ./
 
-RUN echo "Please use docker-compose up to start all services"
+# Dependencies install කරනවා
+RUN npm install
 
-CMD ["npm", "--version"]
+# මුළු project එකම (frontend/backend files) copy කරනවා
+COPY . .
+
+# App එක start කරනවා
+CMD ["npm", "start"]

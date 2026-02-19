@@ -14,12 +14,12 @@ pipeline {
     stages {
         stage('Verify Project') {
             steps {
-                echo '🔍 Verifying project structure...'
+                echo ' Verifying project structure...'
                 bat '''
-                    if exist "backend\\package.json" (echo ✅ Backend found) else (echo ❌ Backend missing)
-                    if exist "frontend\\package.json" (echo ✅ Frontend found) else (echo ❌ Frontend missing)
-                    if exist "admin\\package.json" (echo ✅ Admin found) else (echo ❌ Admin missing)
-                    if exist "docker-compose.yml" (echo ✅ Docker Compose found) else (echo ❌ Docker Compose missing)
+                    if exist "backend\\package.json" (echo  Backend found) else (echo  Backend missing)
+                    if exist "frontend\\package.json" (echo  Frontend found) else (echo  Frontend missing)
+                    if exist "admin\\package.json" (echo  Admin found) else (echo  Admin missing)
+                    if exist "docker-compose.yml" (echo  Docker Compose found) else (echo  Docker Compose missing)
                 '''
             }
         }
@@ -28,7 +28,7 @@ pipeline {
             parallel {
                 stage('Build Backend') {
                     steps {
-                        echo '🔨 Installing backend dependencies...'
+                        echo ' Installing backend dependencies...'
                         bat '''
                             cd backend
                             npm install --legacy-peer-deps || echo Build completed
@@ -39,7 +39,7 @@ pipeline {
 
                 stage('Build Frontend') {
                     steps {
-                        echo '🔨 Installing frontend dependencies...'
+                        echo ' Installing frontend dependencies...'
                         bat '''
                             cd frontend
                             npm install --legacy-peer-deps || echo Build completed
@@ -50,7 +50,7 @@ pipeline {
 
                 stage('Build Admin') {
                     steps {
-                        echo '🔨 Installing admin dependencies...'
+                        echo ' Installing admin dependencies...'
                         bat '''
                             cd admin
                             npm install --legacy-peer-deps || echo Build completed
@@ -63,9 +63,9 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                echo '🐳 Building Docker images...'
+                echo ' Building Docker images...'
                 bat '''
-                    docker ps >nul 2>&1 || (echo ⚠️ Docker not running && exit /b 0)
+                    docker ps >nul 2>&1 || (echo  Docker not running && exit /b 0)
                     docker-compose build || echo Docker build completed
                 '''
             }
@@ -73,7 +73,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo '🚀 Deploying application...'
+                echo ' Deploying application...'
                 bat '''
                     docker-compose down --remove-orphans
                     docker-compose up -d
@@ -86,7 +86,7 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo '💚 Checking services...'
+                echo ' Checking services...'
                 bat 'docker-compose ps || echo Service check completed'
             }
         }
@@ -94,10 +94,10 @@ pipeline {
 
     post {
         always {
-            echo '📊 Pipeline completed'
+            echo ' Pipeline completed'
         }
         success {
-            echo '✅ SUCCESS! Application deployed!'
+            echo ' SUCCESS! Application deployed!'
             echo '================================'
             echo 'Frontend: http://localhost:3000'
             echo 'Backend: http://localhost:4000'
@@ -105,7 +105,7 @@ pipeline {
             echo '================================'
         }
         failure {
-            echo '❌ Pipeline failed - check logs'
+            echo ' Pipeline failed - check logs'
         }
     }
 }
