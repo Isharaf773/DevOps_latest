@@ -77,7 +77,9 @@ pipeline {
                 bat '''
                     docker-compose down --remove-orphans
                     docker-compose up -d
-                    timeout /t 10 /nobreak
+                    echo Waiting for containers to start...
+                    ping -n 15 127.0.0.1 >nul
+                    docker-compose ps
                 '''
             }
         }
