@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family:Outfit ;
+  scroll-behavior: smooth;
+}
+
+body{
+  min-height: 100vh;
+  background-color: rgb(255, 229, 216);
+}
+a{
+  text-decoration: none;
+  color: inherit;
+}
+
+.app{
+  width: 80%;
+  margin: auto;
+}
+@keyframes fadeIn{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
+}
+
+/* Toast Notification Styles */
+.Toastify__toast-container {
+  z-index: 9999 !important;
+  top: 80px !important; /* Position below navbar */
+}
+
+.Toastify__toast-container--top-center {
+  top: 80px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.Toastify__toast {
+  border-radius: 12px !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 500 !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #48bb78, #38a169) !important;
+  color: white !important;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #e53e3e, #c53030) !important;
+  color: white !important;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #3182ce, #2c5aa0) !important;
+  color: white !important;
+}
+
+.Toastify__progress-bar {
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+
+.Toastify__close-button {
+  color: white !important;
+  opacity: 0.8 !important;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1 !important;
+}
+
+/* Toast Container Positioning - Ensure it's always visible */
+.Toastify__toast-container {
+  z-index: 99999 !important;
+  position: fixed !important;
+  top: 20px !important;
+}
+
+.Toastify__toast-container--top-center {
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+  max-width: 500px !important;
+}
+
+.Toastify__toast {
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  min-height: 60px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+}

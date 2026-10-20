@@ -1,0 +1,23 @@
+# Jenkins with Docker + Terraform preinstalled
+#   docker compose -f docker-compose.jenkins.yml up -d --build
+#   docker exec food_jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+name: food-jenkins
+
+services:
+  jenkins:
+    build: ./jenkins
+    image: food-jenkins:lts
+    container_name: food_jenkins
+    restart: unless-stopped
+    # root is needed to use the host Docker socket (works on Docker Desktop / Windows too).
+    # Fine for a local lab; on a shared server use a docker-group setup instead.
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  jenkins_home:

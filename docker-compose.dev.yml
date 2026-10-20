@@ -1,0 +1,82 @@
+# Development stack with hot reload
+#   docker compose -f docker-compose.dev.yml up --build
+name: food-delivery-dev
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: food_mongodb_dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: devpassword
+      MONGO_INITDB_DATABASE: fooddb
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongodb_data_dev:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks: [food-network-dev]
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    container_name: food_backend_dev
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      MONGO_URI: mongodb://admin:devpassword@mongodb:27017/fooddb?authSource=admin
+      JWT_SECRET: dev_secret_key
+      FRONTEND_URL: http://localhost:3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks: [food-network-dev]
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: food_frontend_dev
+    depends_on: [backend]
+    ports:
+      - "3000:5173"
+    environment:
+      VITE_API_URL: http://localhost:4000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks: [food-network-dev]
+
+  admin:
+    build:
+      context: ./admin
+      target: dev
+    container_name: food_admin_dev
+    depends_on: [backend]
+    ports:
+      - "3001:5173"
+    environment:
+      VITE_API_URL: http://localhost:4000
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    networks: [food-network-dev]
+
+networks:
+  food-network-dev:
+    driver: bridge
+
+volumes:
+  mongodb_data_dev:

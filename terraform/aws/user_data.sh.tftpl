@@ -1,0 +1,43 @@
+#!/bin/bash
+# Runs once at first boot (cloud-init, as root). Log: /var/log/food-bootstrap.log
+set -euo pipefail
+exec > >(tee -a /var/log/food-bootstrap.log) 2>&1
+
+echo "[bootstrap] start $(date -u)"
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y ca-certificates curl git
+
+# Docker Engine + compose plugin
+curl -fsSL https://get.docker.com | sh
+usermod -aG docker ubuntu
+systemctl enable --now docker
+
+# App checkout (compose file lives in the repo)
+sudo -u ubuntu git clone --branch "${repo_branch}" --depth 1 "${repo_url}" /home/ubuntu/food-delivery
+cd /home/ubuntu/food-delivery
+
+cat > .env <<ENVEOF
+NODE_ENV=production
+MONGO_USER=admin
+MONGO_PASSWORD=${mongo_password}
+MONGO_DB=fooddb
+JWT_SECRET=${jwt_secret}
+STRIPE_SECRET_KEY=${stripe_secret_key}
+API_URL=http://${public_ip}:4000
+FRONTEND_URL=http://${public_ip}:3000
+IMAGE_NAMESPACE=${image_namespace}
+IMAGE_TAG=${image_tag}
+ENVEOF
+chmod 600 .env
+chown ubuntu:ubuntu .env
+
+# Prefer pre-built images from Docker Hub; fall back to building on the server
+# (first apply, before Jenkins has pushed anything).
+if ! sudo -u ubuntu docker compose pull --quiet; then
+  echo "[bootstrap] images not on registry yet - building locally"
+  sudo -u ubuntu docker compose build
+fi
+sudo -u ubuntu docker compose up -d --no-build
+
+echo "[bootstrap] done $(date -u)"

@@ -1,0 +1,6 @@
+# cp terraform.tfvars.example terraform.tfvars   (git-ignored)
+docker_host     = "npipe:////./pipe/docker_engine" # Linux/macOS: "unix:///var/run/docker.sock"
+image_namespace = "foodapp"
+image_tag       = "latest"
+mongo_password  = "change_me_mongo_password"
+jwt_secret      = "change_me_to_a_long_random_string"
