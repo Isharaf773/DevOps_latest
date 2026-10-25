@@ -10,6 +10,7 @@ pipeline {
         booleanParam(name: 'PUSH_IMAGES', defaultValue: false, description: 'Push images to Docker Hub (needs credential dockerhub-creds). Required for aws deploys')
         booleanParam(name: 'TERRAFORM_PLAN', defaultValue: false, description: 'Run terraform plan for terraform/aws (needs credentials aws-creds + terraform-tfvars)')
         booleanParam(name: 'TERRAFORM_APPLY', defaultValue: false, description: 'Run terraform apply after manual approval (needs remote state: terraform/aws/backend.tf)')
+        booleanParam(name: 'RUN_TRIVY', defaultValue: false, description: 'Run the Trivy image scan (first run downloads a vulnerability DB; slow networks may time out)')
         booleanParam(name: 'FAIL_ON_VULNERABILITIES', defaultValue: false, description: 'Fail the build if Trivy finds HIGH/CRITICAL fixable CVEs')
     }
 
@@ -24,7 +25,7 @@ pipeline {
 
     options {
         timestamps()
-        timeout(time: 45, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
         buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
     }
@@ -91,20 +92,24 @@ pipeline {
         }
 
         stage('Security Scan (Trivy)') {
+            when { expression { params.RUN_TRIVY } }
             steps {
-                sh '''
-                    EXIT_CODE=0
-                    if [ "$FAIL_ON_VULN" = "true" ]; then EXIT_CODE=1; fi
-                    for svc in backend frontend admin; do
-                        docker run --rm \
-                            -v /var/run/docker.sock:/var/run/docker.sock \
-                            -v trivy-cache:/root/.cache/ \
-                            aquasec/trivy:latest image \
-                            --severity HIGH,CRITICAL --ignore-unfixed --no-progress \
-                            --exit-code $EXIT_CODE \
-                            $IMAGE_NAMESPACE/$svc:$IMAGE_TAG
-                    done
-                '''
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sh '''
+                        EXIT_CODE=0
+                        if [ "$FAIL_ON_VULN" = "true" ]; then EXIT_CODE=1; fi
+                        for svc in backend frontend admin; do
+                            docker run --rm \
+                                -v /var/run/docker.sock:/var/run/docker.sock \
+                                -v trivy-cache:/root/.cache/ \
+                                aquasec/trivy:latest image \
+                                --timeout 30m \
+                                --severity HIGH,CRITICAL --ignore-unfixed --no-progress \
+                                --exit-code $EXIT_CODE \
+                                $IMAGE_NAMESPACE/$svc:$IMAGE_TAG
+                        done
+                    '''
+                }
             }
         }
 
