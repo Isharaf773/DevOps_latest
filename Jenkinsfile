@@ -31,9 +31,9 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+                stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/Isharaf773/DevOps_latest.git'
                 sh 'git log -1 --pretty="%h %s" || true'
             }
         }

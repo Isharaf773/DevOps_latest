@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+
 # Backend - Node.js / Express API
 
 FROM node:20-alpine AS deps

@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+
 # Frontend (customer app) - React + Vite, served by nginx
 
 FROM node:20-alpine AS base
