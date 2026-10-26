@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
+import header1 from '../../assets/header1.jpg';
+import header2 from '../../assets/header2.png';
+import header3 from '../../assets/header3.webp';
+import header4 from '../../assets/header4.jpg';
+import header5 from '../../assets/header5.jpg';
 
 const Header = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
   // Import your header images
-  const headerImages = [
-    '/src/assets/header1.jpg',
-    '/src/assets/header2.png', 
-    '/src/assets/header3.webp',
-    '/src/assets/header4.jpg',
-    '/src/assets/header5.jpg'
-  ];
-
+   const headerImages = [header1, header2, header3, header4, header5];
   // Auto slide every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
