@@ -48,7 +48,7 @@ const Header = () => {
             style={{ backgroundImage: `url(${image})` }}
           >
             <div className="header-contents">
-              <h2>Order your favourite food here</h2>
+              <h2>Order your favourite food.</h2>
               <p>Choose from a wide variety of delicious dishes prepared with the freshest ingredients. From traditional favorites to modern culinary creations, we have something for every palate.</p>
               <button>View Menu</button>
             </div>
